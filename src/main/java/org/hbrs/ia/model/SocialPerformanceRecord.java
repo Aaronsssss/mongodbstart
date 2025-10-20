@@ -12,7 +12,7 @@ public class SocialPerformanceRecord {
     private Integer communicationSkills;
     private Integer integrityToCompany;
 
-    SocialPerformanceRecord(Integer year, Integer leadershipCompetence, Integer opennessToEmployee, Integer socialBehavior, Integer attitude, Integer communicationSkills, Integer integrityToCompany) {
+    public SocialPerformanceRecord(Integer year, Integer leadershipCompetence, Integer opennessToEmployee, Integer socialBehavior, Integer attitude, Integer communicationSkills, Integer integrityToCompany) {
         this.year = year;
         this.leadershipCompetence = leadershipCompetence;
         this.opennessToEmployee = opennessToEmployee;
