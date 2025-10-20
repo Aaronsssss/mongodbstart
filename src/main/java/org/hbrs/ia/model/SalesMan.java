@@ -2,10 +2,14 @@ package org.hbrs.ia.model;
 
 import org.bson.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SalesMan {
     private String firstname;
     private String lastname;
     private Integer sid;
+    private List<SocialPerformanceRecord> socialPerformanceRecords;
 
     public SalesMan(String firstname, String lastname, Integer sid) {
         this.firstname = firstname;
@@ -37,11 +41,20 @@ public class SalesMan {
         this.sid = sid;
     }
 
+    public List<SocialPerformanceRecord> getSocialPerformanceRecords() {
+        return socialPerformanceRecords;
+    }
+
+    public void setSocialPerformanceRecords(List<SocialPerformanceRecord> socialPerformanceRecords) {
+        this.socialPerformanceRecords = socialPerformanceRecords;
+    }
+
     public Document toDocument() {
         org.bson.Document document = new Document();
         document.append("firstname" , this.firstname );
         document.append("lastname" , this.lastname );
         document.append("sid" , this.sid);
+        document.append("socialperformancerecord", new ArrayList<>());
         return document;
     }
 }
