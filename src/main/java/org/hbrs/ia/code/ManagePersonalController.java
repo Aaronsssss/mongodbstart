@@ -10,6 +10,8 @@ import org.hbrs.ia.model.SocialPerformanceRecord;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mongodb.client.model.Filters.eq;
+
 public class ManagePersonalController implements ManagePersonal{
 
     private MongoClient client;
@@ -23,6 +25,15 @@ public class ManagePersonalController implements ManagePersonal{
         salesmen = supermongo.getCollection("salesmen");
     }
 
+    /**
+     * For Testing class
+     * @param databaseName
+     */
+    public void setDatabase(String databaseName) {
+        supermongo = client.getDatabase(databaseName);
+        salesmen = supermongo.getCollection("salesmen");
+    }
+
 
     @Override
     public void createSalesMan(SalesMan record) {
@@ -31,19 +42,36 @@ public class ManagePersonalController implements ManagePersonal{
 
     @Override
     public void addSocialPerformanceRecord(SocialPerformanceRecord record, SalesMan salesMan) {
-        Document update = new Document("$push", 
-            new Document("socialperformancerecord", record.toDocument())
+        // Create the update operation: push the new SocialPerformanceRecord to the array
+        Document update = new Document("$push",
+                new Document("socialperformancerecord", record.toDocument())
         );
-        
+
+        // If the "socialperformancerecord" field does not exist, ensure it is created as an array
+        Document setOnInsert = new Document("$setOnInsert",
+                new Document("socialperformancerecord", new ArrayList<>())
+        );
+
+        // Perform an upsert operation to ensure the field exists
         salesmen.updateOne(
-            new Document("sid", salesMan.getId()),
-            update
+                new Document("sid", salesMan.getId()), // Find the document for the SalesMan
+                new Document("$setOnInsert", setOnInsert) // Ensure the field exists as an array
         );
+
+        // Add the record to the "socialperformancerecord" array
+        salesmen.updateOne(
+                new Document("sid", salesMan.getId()),
+                update
+        );
+
+        // Update the in-memory salesMan object
+        salesMan.addSocialPerformanceRecord(record);
     }
 
     @Override
     public SalesMan readSalesMan(int sid) {
         Document newDocument = this.salesmen.find(new Document("sid" , sid)).first();
+        this.salesmen.find(eq("sid", "123"));
         assert newDocument != null;
         return new SalesMan(newDocument.get("firstname").toString() , newDocument.get("lastname").toString() , sid);
     }
@@ -60,12 +88,36 @@ public class ManagePersonalController implements ManagePersonal{
     }
 
     @Override
-    public List<SocialPerformanceRecord> readSocialPerformanceRecord(SalesMan salesMan) {
-        Document newDocument = salesmen.find(new Document("sid" , salesMan.getId())).first();
-        assert newDocument != null;
-        SalesMan salesman = new SalesMan(newDocument.get("firstname").toString() , newDocument.get("lastname").toString() , salesMan.getId());
+    public SocialPerformanceRecord readSocialPerformanceRecord(SalesMan salesMan, int year) {
+        // Fetch the document for the specified salesman
+        Document newDocument = salesmen.find(new Document("sid", salesMan.getId())).first();
         
-        return List.of();
+        // Check if the document exists
+        if (newDocument == null) {
+            // Handle the case where the salesman's document does not exist
+            System.err.println("No document found for salesman with ID: " + salesMan.getId());
+            return null;
+        }
+
+        // Extract and cast the "socialperformancerecord" field if it exists
+        List<Document> socialRecords = newDocument.getList("socialperformancerecord", Document.class);
+
+        if (socialRecords == null) {
+            System.err.println("No social performance records found for salesman with ID: " + salesMan.getId());
+            return null;
+        }
+
+        // Iterate through the records to find the matching year
+        for (Document record : socialRecords) {
+            if (record.getInteger("year") == year) {
+                // Convert the record document into a SocialPerformanceRecord instance
+                return SocialPerformanceRecord.fromDocument(record);
+            }
+        }
+
+        // If no record is found for the specified year
+        System.err.println("No social performance record found for year: " + year + " for salesman with ID: " + salesMan.getId());
+        return null;
     }
 
     @Override

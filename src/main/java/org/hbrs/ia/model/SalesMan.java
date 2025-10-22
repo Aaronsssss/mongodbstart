@@ -15,6 +15,7 @@ public class SalesMan {
         this.firstname = firstname;
         this.lastname = lastname;
         this.sid = sid;
+        this.socialPerformanceRecords = new ArrayList<>();
     }
 
     public String getFirstname() {
@@ -45,8 +46,8 @@ public class SalesMan {
         return socialPerformanceRecords;
     }
 
-    public void setSocialPerformanceRecords(List<SocialPerformanceRecord> socialPerformanceRecords) {
-        this.socialPerformanceRecords = socialPerformanceRecords;
+    public void addSocialPerformanceRecord(SocialPerformanceRecord record) {
+        this.socialPerformanceRecords.add(record);
     }
 
     public Document toDocument() {

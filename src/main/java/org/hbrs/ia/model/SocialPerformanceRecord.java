@@ -89,6 +89,18 @@ public class SocialPerformanceRecord {
         document.append("integrityToCompany", this.integrityToCompany);
         return document;
     }
+
+    public static SocialPerformanceRecord fromDocument(Document document) {
+        Integer year = (Integer) document.get("year");
+        Integer leadershipCompetence = (Integer) document.get("leadershipCompetence");
+        Integer opennessToEmployee = (Integer) document.get("opennessToEmployee");
+        Integer socialBehavior = (Integer) document.get("socialBehavior");
+        Integer attitude = (Integer) document.get("attitude");
+        Integer communicationSkills = (Integer) document.get("communicationSkills");
+        Integer integrityToCompany = (Integer) document.get("integrityToCompany");
+
+        return new SocialPerformanceRecord(year, leadershipCompetence, opennessToEmployee, socialBehavior, attitude, communicationSkills, integrityToCompany);
+    }
     
 
 }

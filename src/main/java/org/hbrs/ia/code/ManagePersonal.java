@@ -18,8 +18,10 @@ public interface ManagePersonal {
 
     public List<SalesMan> readAllSalesMen();
 
-    public List<SocialPerformanceRecord> readSocialPerformanceRecord( SalesMan salesMan );
+    //public List<SocialPerformanceRecord> readSocialPerformanceRecords( SalesMan salesMan );
     // Remark: How do you integrate the year?
+
+    public SocialPerformanceRecord readSocialPerformanceRecord( SalesMan salesMan, int year);
 
     public void updateSalesMan( SalesMan record );
 
